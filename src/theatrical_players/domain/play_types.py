@@ -16,7 +16,13 @@ class PlayType(IPlayType):
 
     def volume_credits(self, audience: int) -> int:
         return max(audience - 30, 0)
-        
+
+    @classmethod
+    def from_str(cls, name_type: str):
+        try:
+            return PLAY_TYPES[name_type]
+        except KeyError as e:
+            raise ValueError(f"unknown type: {name_type}") from e
 
 class Tragedy(PlayType):
     def bonus(self, audience: int) -> int:
@@ -42,9 +48,3 @@ class Comedy(PlayType):
         return v
 
 PLAY_TYPES = {"comedy": Comedy(), "tragedy": Tragedy()}
-
-def get_play_type(name_type: str) -> PlayType:
-    try:
-        return PLAY_TYPES[name_type]
-    except KeyError as e:
-        raise ValueError(f"unknown type: {name_type}") from e

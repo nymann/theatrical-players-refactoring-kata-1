@@ -3,6 +3,7 @@ from theatrical_players.data.order import Order
 from theatrical_players.data.invoice import Invoice
 from theatrical_players.data.play import Play
 from theatrical_players.data.performance import Performance
+from theatrical_players.domain.play_types import PlayType
 
 class Statement(object):
     def __init__(self, invoice: Invoice) -> None:
@@ -24,7 +25,8 @@ class Statement(object):
     def from_json(cls, invoice: Dict[str, Any], plays: Dict[str, Dict[str, str]]):
         temp_plays: Dict[str, Play] = {}
         for play_id, play in plays.items():
-            temp_plays[play_id] = Play.from_json(play_id=play_id, play=play)
+            play_type = PlayType.from_str(play["type"])
+            temp_plays[play_id] = Play(play_id=play_id, name=play["name"], play_type=play_type)
 
         performances: List[Performance] = []
         for performance in invoice["performances"]:
