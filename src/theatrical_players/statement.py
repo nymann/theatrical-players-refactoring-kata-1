@@ -1,11 +1,11 @@
-from typing import Dict, Any
 import math
+from typing import Any, Dict
 
 
 def statement(invoice: Dict[str, Any], plays: Dict[str, Dict[str, str]]):
     total_amount: float = 0
     volume_credits: float = 0
-    result = f'Statement for {invoice["customer"]}\n'
+    result: str = f'Statement for {invoice["customer"]}\n'
 
     def format_as_dollars(amount: float):
         return f"${amount:0,.2f}"
@@ -38,5 +38,3 @@ def statement(invoice: Dict[str, Any], plays: Dict[str, Dict[str, str]]):
     result += f'Amount owed is {format_as_dollars(total_amount/100)}\n'
     result += f'You earned {volume_credits} credits\n'
     return result
-
-

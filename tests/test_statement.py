@@ -1,10 +1,10 @@
 import json
 
-import pytest
-from approvaltests import verify
 from approvaltests.utils import get_adjacent_file
+from approvaltests import verify
+import pytest
 
-from statement import statement
+from theatrical_players.statement import statement
 
 
 def test_example_statement():
