@@ -4,7 +4,7 @@ from approvaltests.utils import get_adjacent_file
 from approvaltests import verify
 import pytest
 
-from theatrical_players.statement import Statement
+from theatrical_players.domain.statement import Statement
 
 def test_example_statement():
     with open(get_adjacent_file("invoice.json")) as f:

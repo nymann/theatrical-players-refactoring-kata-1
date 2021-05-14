@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from theatrical_players.play import Play
+from theatrical_players.data.play import Play
 
 @dataclass
 class Performance(object):

@@ -43,8 +43,8 @@ class Comedy(PlayType):
 
 PLAY_TYPES = {"comedy": Comedy(), "tragedy": Tragedy()}
 
-def get_play_type_from_name(name: str) -> PlayType:
+def get_play_type(name_type: str) -> PlayType:
     try:
-        return PLAY_TYPES[name]
+        return PLAY_TYPES[name_type]
     except KeyError as e:
-        raise ValueError(f"unknown type: {name}") from e
+        raise ValueError(f"unknown type: {name_type}") from e

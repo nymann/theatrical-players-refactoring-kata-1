@@ -1,7 +1,7 @@
 import json
 import pathlib
 
-from theatrical_players.statement import Statement
+from theatrical_players.domain.statement import Statement
 
 import typer
 
