@@ -1,12 +1,13 @@
+from typing import Dict, Any
 import math
 
 
-def statement(invoice, plays):
-    total_amount = 0
-    volume_credits = 0
+def statement(invoice: Dict[str, Any], plays: Dict[str, Dict[str, str]]):
+    total_amount: float = 0
+    volume_credits: float = 0
     result = f'Statement for {invoice["customer"]}\n'
 
-    def format_as_dollars(amount):
+    def format_as_dollars(amount: float):
         return f"${amount:0,.2f}"
 
     for perf in invoice['performances']:
