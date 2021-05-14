@@ -13,7 +13,7 @@ def test_example_statement():
     with open(get_adjacent_file("plays.json")) as f:
         plays = json.loads(f.read())
     statement = Statement.from_json(invoice=invoice, plays=plays)
-    verify(statement.calculate())
+    verify(str(statement))
 
 
 def test_statement_with_new_play_types():
@@ -23,5 +23,5 @@ def test_statement_with_new_play_types():
         plays = json.loads(f.read())
     with pytest.raises(ValueError) as exception_info:
         statement = Statement.from_json(invoice=invoice, plays=plays)
-        statement.calculate()
+        str(statement)
     assert "unknown type" in str(exception_info.value)

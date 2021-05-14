@@ -86,9 +86,28 @@ class Invoice(object):
     performances: List[Performance]
 
 
+@dataclass
+class Order(object):
+    name: str
+    audience: int
+    amount: float
+
+
 class Statement(object):
     def __init__(self, invoice: Invoice) -> None:
         self.invoice: Invoice = invoice
+        self.volume_credits: float = 0
+        self.total_amount: float = 0
+        self.orders: List[Any] = []
+        for performance in self.invoice.performances:
+            play = performance.play
+            play_type = play.play_type
+            this_amount = play_type.bonus(audience=performance.audience)
+            self.volume_credits += play_type.volume_credits(audience=performance.audience)
+            order = Order(name=play.name, audience=performance.audience, amount=this_amount)
+            self.orders.append(order)
+            self.total_amount += this_amount
+
 
     @classmethod
     def from_json(cls, invoice: Dict[str, Any], plays: Dict[str, Dict[str, str]]):
@@ -107,20 +126,12 @@ class Statement(object):
         
         return cls(transformed_invoice)
 
-    def calculate(self):
-        total_amount: float = 0
-        volume_credits: float = 0
+    def __str__(self):
         result: str = f'Statement for {self.invoice.customer}\n'
-        for perf in self.invoice.performances:
-            play = perf.play
-            this_amount = play.play_type.bonus(audience=perf.audience)
-            volume_credits += play.play_type.volume_credits(audience=perf.audience)
-            # print line for this order
-            result += f' {play.name}: {self._format_as_dollars(this_amount/100)} ({perf.audience} seats)\n'
-            total_amount += this_amount
-    
-        result += f"Amount owed is {self._format_as_dollars(total_amount/100)}\n"
-        result += f"You earned {volume_credits} credits\n"
+        for order in self.orders:
+            result += f' {order.name}: {self._format_as_dollars(order.amount/100)} ({order.audience} seats)\n'
+        result += f"Amount owed is {self._format_as_dollars(self.total_amount/100)}\n"
+        result += f"You earned {self.volume_credits} credits\n"
         return result
 
     def _format_as_dollars(self, amount: float) -> str:

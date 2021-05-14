@@ -28,7 +28,7 @@ def main(
         plays_json = json.loads(plays_file.read())
 
     statement = Statement.from_json(invoice=invoice_json, plays=plays_json)
-    typer.echo(statement.calculate())
+    typer.echo(str(statement))
 
 
 if __name__ == "__main__":
