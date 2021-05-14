@@ -5,6 +5,7 @@ from approvaltests import verify
 import pytest
 
 from theatrical_players.domain.statement import Statement
+from theatrical_players.presentation.text import Text
 
 def test_example_statement():
     with open(get_adjacent_file("invoice.json")) as f:
@@ -12,7 +13,8 @@ def test_example_statement():
     with open(get_adjacent_file("plays.json")) as f:
         plays = json.loads(f.read())
     statement = Statement.from_json(invoice=invoice, plays=plays)
-    verify(str(statement))
+    presentation = Text(statement)
+    verify(str(presentation))
 
 
 def test_statement_with_new_play_types():
@@ -22,5 +24,6 @@ def test_statement_with_new_play_types():
         plays = json.loads(f.read())
     with pytest.raises(ValueError) as exception_info:
         statement = Statement.from_json(invoice=invoice, plays=plays)
-        str(statement)
+        presentation = Text(statement)
+        str(presentation)
     assert "unknown type" in str(exception_info.value)

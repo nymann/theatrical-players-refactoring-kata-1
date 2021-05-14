@@ -9,16 +9,16 @@ class Statement(object):
     def __init__(self, invoice: Invoice) -> None:
         self.invoice: Invoice = invoice
         self.volume_credits: float = 0
-        self.total_amount: float = 0
+        self.total_amount_cents: float = 0
         self.orders: List[Order] = []
         for performance in self.invoice.performances:
             play = performance.play
             play_type = play.play_type
-            this_amount = play_type.bonus(audience=performance.audience)
+            this_amount_cents = play_type.bonus(audience=performance.audience)
             self.volume_credits += play_type.volume_credits(audience=performance.audience)
-            order = Order(name=play.name, audience=performance.audience, amount=this_amount)
+            order = Order(name=play.name, audience=performance.audience, amount=this_amount_cents)
             self.orders.append(order)
-            self.total_amount += this_amount
+            self.total_amount_cents += this_amount_cents
 
 
     @classmethod
@@ -39,13 +39,6 @@ class Statement(object):
         
         return cls(transformed_invoice)
 
-    def __str__(self):
-        result: str = f'Statement for {self.invoice.customer}\n'
-        for order in self.orders:
-            result += f' {order.name}: {self._format_as_dollars(order.amount/100)} ({order.audience} seats)\n'
-        result += f"Amount owed is {self._format_as_dollars(self.total_amount/100)}\n"
-        result += f"You earned {self.volume_credits} credits\n"
-        return result
 
     def _format_as_dollars(self, amount: float) -> str:
         return f"${amount:0,.2f}"
