@@ -1,7 +1,9 @@
+from theatrical_players.domain.i_currency import ICurrency
+from theatrical_players.domain.currencies import Usd
 from theatrical_players.presentation.presentation import Presentation
 
 class Html(Presentation):
-    def __str__(self):
+    def __str__(self, currency: ICurrency = Usd()):
         customer = self.statement.invoice.customer
         html = self._header(f"Statement | {customer}")
         html += self._style()
@@ -9,13 +11,15 @@ class Html(Presentation):
         body_text += "<table>\n<tr>\n\t<th>Name</th>\n\t<th>Amount ($)</th>\n\t<th>Audience (seats)</th>\n</tr>\n"
         audience_sum: int = 0
         for order in self.statement.orders:
+            order_amount = currency.format(order.amount)
             audience_sum += order.audience
             body_text += "<tr>\n"
             body_text += f"\t<td>{order.name}</td>\n"
-            body_text += f"\t<td>{self.statement._format_as_dollars(order.amount/100)}</td>\n"
+            body_text += f"\t<td>{order_amount}</td>\n"
             body_text += f"\t<td>{order.audience}</td>\n"
             body_text += "</tr>\n"
-        body_text += f"<tr>\n\t<td><strong>Total</strong></td>\n\t<td><strong>{self.statement._format_as_dollars(self.statement.total_amount_cents/100)}</strong></td>\n\t<td><strong>{audience_sum}</strong></td>\n</tr>\n"
+        total_amount = currency.format(self.statement.total_amount_cents)
+        body_text += f"<tr>\n\t<td><strong>Total</strong></td>\n\t<td><strong>{total_amount}</strong></td>\n\t<td><strong>{audience_sum}</strong></td>\n</tr>\n"
         body_text += "<table>\n"
         body_text += f"<h3>You earned {self.statement.volume_credits} credits</h3>"
         html += self._body(body_text)

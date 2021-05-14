@@ -38,7 +38,3 @@ class Statement(object):
         transformed_invoice = Invoice(customer=invoice["customer"], performances=performances)
         
         return cls(transformed_invoice)
-
-
-    def _format_as_dollars(self, amount: float) -> str:
-        return f"${amount:0,.2f}"
