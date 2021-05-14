@@ -3,19 +3,6 @@ import math
 from abc import ABC, abstractmethod
 from typing import Dict, List, Any
 
-PLAY_TYPE = {
-    "tragedy": {
-        "min_audience": 30,
-        "bonus_multiplier": 1000,
-        "start_bonus": 0
-    },
-    "comedy": {
-        "min_audience": 20,
-        "bonus_multiplier": 500,
-        "start_bonus": 10000,
-    }
-}
-
 class IPlayType(ABC):
 
     @abstractmethod
