@@ -22,8 +22,6 @@ def test_statement_with_new_play_types():
         invoice = json.loads(f.read())
     with open(get_adjacent_file("new_plays.json")) as f:
         plays = json.loads(f.read())
-    with pytest.raises(ValueError) as exception_info:
-        statement = Statement.from_json(invoice=invoice, plays=plays)
-        presentation = Text(statement)
-        str(presentation)
-    assert "unknown type" in str(exception_info.value)
+    statement = Statement.from_json(invoice=invoice, plays=plays)
+    presentation = Text(statement)
+    verify(str(presentation))
