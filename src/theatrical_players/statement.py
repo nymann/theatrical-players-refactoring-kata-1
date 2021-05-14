@@ -1,28 +1,94 @@
+from dataclasses import dataclass
 import math
-import pydantic
+from abc import ABC, abstractmethod
 from typing import Dict, List, Any
 
-class Play(pydantic.BaseModel):
+PLAY_TYPE = {
+    "tragedy": {
+        "min_audience": 30,
+        "bonus_multiplier": 1000,
+        "start_bonus": 0
+    },
+    "comedy": {
+        "min_audience": 20,
+        "bonus_multiplier": 500,
+        "start_bonus": 10000,
+    }
+}
+
+class IPlayType(ABC):
+
+    @abstractmethod
+    def volume_credits(self, audience) -> int:
+        pass
+
+    @abstractmethod
+    def bonus(self, audience: int) -> int:
+        pass
+
+class PlayType(IPlayType):
+    def bonus(self, audience: int) -> int:
+        raise NotImplementedError(audience)
+
+    def volume_credits(self, audience: int) -> int:
+        return max(audience - 30, 0)
+        
+
+class Tragedy(PlayType):
+    def bonus(self, audience: int) -> int:
+        amount = 40000
+        min = 30
+        if audience > min:
+            amount += 1000 * (audience - min)
+        return amount
+
+
+class Comedy(PlayType):
+    def bonus(self, audience: int) -> int:
+        amount = 30000
+        min = 20
+        if audience > min:
+            amount += 10000 + 500 * (audience - min)
+        amount += 300 * audience
+        return amount
+
+    def volume_credits(self, audience: int) -> int:
+        v = super().volume_credits(audience)
+        v += math.floor(audience / 5)
+        return v
+
+PLAY_TYPES = {"comedy": Comedy(), "tragedy": Tragedy()}
+
+@dataclass
+class Play(object):
     play_id: str
     name: str
-    play_type: str
+    play_type: PlayType
 
     @classmethod
     def from_json(cls, play_id: str, play: Dict[str, str]):
-        return cls(play_id=play_id, name=play["name"], play_type=play["type"])
+        try:
+            play_type = PLAY_TYPES[play["type"]]
+        except KeyError as e:
+            raise ValueError(f"unknown type: {play['type']}") from e
+        return cls(play_id=play_id, name=play["name"], play_type=play_type)
 
 
-class Performance(pydantic.BaseModel):
+@dataclass
+class Performance(object):
     play: Play
     audience: int
 
-class Invoice(pydantic.BaseModel):
+
+@dataclass
+class Invoice(object):
     customer: str
     performances: List[Performance]
 
+
 class Statement(object):
     def __init__(self, invoice: Invoice) -> None:
-        self.invoice = invoice
+        self.invoice: Invoice = invoice
 
     @classmethod
     def from_json(cls, invoice: Dict[str, Any], plays: Dict[str, Dict[str, str]]):
@@ -47,25 +113,8 @@ class Statement(object):
         result: str = f'Statement for {self.invoice.customer}\n'
         for perf in self.invoice.performances:
             play = perf.play
-            if play.play_type == "tragedy":
-                this_amount = 40000
-                if perf.audience > 30:
-                    this_amount += 1000 * (perf.audience - 30)
-            elif play.play_type == "comedy":
-                this_amount = 30000
-                if perf.audience > 20:
-                    this_amount += 10000 + 500 * (perf.audience - 20)
-    
-                this_amount += 300 * perf.audience
-    
-            else:
-                raise ValueError(f'unknown type: {play.play_type}')
-    
-            # add volume credits
-            volume_credits += max(perf.audience - 30, 0)
-            # add extra credit for every ten comedy attendees
-            if "comedy" == play.play_type:
-                volume_credits += math.floor(perf.audience / 5)
+            this_amount = play.play_type.bonus(audience=perf.audience)
+            volume_credits += play.play_type.volume_credits(audience=perf.audience)
             # print line for this order
             result += f' {play.name}: {self._format_as_dollars(this_amount/100)} ({perf.audience} seats)\n'
             total_amount += this_amount
