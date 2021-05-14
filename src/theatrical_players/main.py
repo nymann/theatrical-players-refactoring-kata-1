@@ -1,7 +1,7 @@
 import json
 import pathlib
 
-from theatrical_players.statement import statement
+from theatrical_players.statement import Statement
 
 import typer
 
@@ -27,8 +27,8 @@ def main(
     with plays.open("r") as plays_file:
         plays_json = json.loads(plays_file.read())
 
-    result = statement(invoice=invoice_json, plays=plays_json)
-    typer.echo(result)
+    statement = Statement.from_json(invoice=invoice_json, plays=plays_json)
+    typer.echo(statement.calculate())
 
 
 if __name__ == "__main__":
