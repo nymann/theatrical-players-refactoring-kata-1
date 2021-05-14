@@ -12,7 +12,7 @@ class IPlayType(ABC):
 
 class PlayType(IPlayType):
     def bonus(self, audience: int) -> int:
-        raise NotImplementedError(audience)
+        return 0
 
     def volume_credits(self, audience: int) -> int:
         return max(audience - 30, 0)
@@ -47,4 +47,17 @@ class Comedy(PlayType):
         v += audience // 5
         return v
 
-PLAY_TYPES = {"comedy": Comedy(), "tragedy": Tragedy()}
+
+class History(PlayType):
+    def bonus(self, audience: int) -> int:
+        amount = 25000
+        min = 40
+        if audience > min:
+            amount += 1000 * (audience - min)**2
+        return amount
+
+
+class Pastoral(PlayType):
+    pass
+
+PLAY_TYPES = {"comedy": Comedy(), "tragedy": Tragedy(), "history": History(), "pastoral": Pastoral()}
