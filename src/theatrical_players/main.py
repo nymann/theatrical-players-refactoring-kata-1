@@ -5,9 +5,16 @@ from theatrical_players.statement import statement
 
 import typer
 
-DEFAULT_FILE_OPTIONS = typer.Option(..., exists=True, file_okay=True, dir_okay=True, readable=True)
+DEFAULT_FILE_OPTIONS = typer.Option(
+    ...,
+    exists=True,
+    file_okay=True,
+    dir_okay=True,
+    readable=True,
+)
 
 app = typer.Typer()
+
 
 @app.command()
 def main(
@@ -19,9 +26,10 @@ def main(
 
     with plays.open("r") as plays_file:
         plays_json = json.loads(plays_file.read())
-    
+
     result = statement(invoice=invoice_json, plays=plays_json)
     typer.echo(result)
+
 
 if __name__ == "__main__":
     app()
